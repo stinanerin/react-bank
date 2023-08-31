@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import TransferForm from "./TransferForm";
 
@@ -6,53 +6,31 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const ATM = () => {
-    const [balance, setBalance] = useState(10000);
+    const [balance, setBalance] = useState(9999);
     const [currency, setCurrency] = useState("SEK");
     const [transfer, setTransfer] = useState("");
 
-    const [hasMounted, setHasMounted] = useState(false);
+    // const [hasMounted, setHasMounted] = useState(false);
 
-    // useEffect(() => {
-    //     console.log("balance", balance);
-    // }, [balance]);
-    // useEffect(() => {
-    //     console.log("transfer", transfer);
-    // }, [transfer]);
-
-    // useEffect(() => {
-    //     setHasMounted(true);
-    //     console.log("currency changed ueseffect ran", currency);
-    //     console.log("hasMounted", hasMounted);
-
-    //     // If currency changes - recalculate balance
-    //     return () => {
-    //         console.log("inside cleanup - before change", currency);
-    //         if (hasMounted) {
-    //             if (currency === "SEK") {
-    //                 console.log("hej");
-    //                 // todo bug - this happens on first mount?
-    //                 setBalance((prevState) => prevState / 10);
-    //             } else {
-    //                 console.log("hejdå");
-
-    //                 setBalance((prevState) => prevState * 10);
-    //             }
-    //         }
-    //     };
-    // }, [currency]);
+    const hasMountedRef = useRef(false);
 
     useEffect(() => {
-        console.log("hasMounted", hasMounted);
-        if (hasMounted) {
+        console.log("Booting up ATM...ATM is ready!");
+        return () => {
+            console.log("ATM shutting down…");
+        };
+    }, []);
+
+    useEffect(() => {
+        if (hasMountedRef.current) {
             if (currency === "SEK") {
                 setBalance((prevState) => prevState * 10);
             } else {
                 setBalance((prevState) => prevState / 10);
             }
         } else {
-            setHasMounted(true);
+            hasMountedRef.current = true;
         }
-        // brandon fråga ett problem?
     }, [currency]);
 
     const toggleCurrency = () => {
@@ -60,8 +38,6 @@ const ATM = () => {
     };
 
     const handleTransfer = (amount) => {
-        // console.log("transfer", transfer, amount);
-
         if (transfer === "deposit") {
             setBalance((prevState) => {
                 return parseInt(prevState) + parseInt(amount);
